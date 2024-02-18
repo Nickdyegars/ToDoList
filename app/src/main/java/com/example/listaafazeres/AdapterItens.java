@@ -2,38 +2,36 @@ package com.example.listaafazeres;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
-import android.widget.TextView;
-
+import android.widget.EditText;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
 public class AdapterItens extends RecyclerView.Adapter<AdapterItens.EventeViewHolder> {
 
     private List<AFazer> listaAFazeres;
-    private Globals globals;
-    private Context context;
-    private InterfaceAtualizarValor interfaceAtualizarValor;
+    private final Globals globals;
+    private final Context context;
+    private final InterfaceAtualizarValor interfaceAtualizarValor;
+    private final Utils utils;
 
     public AdapterItens(List<AFazer> listaAFazeres, Context context, InterfaceAtualizarValor interfaceAtualizarValor) {
         this.listaAFazeres = listaAFazeres;
         this.globals = new Globals(context);
         this.context = context;
         this.interfaceAtualizarValor = interfaceAtualizarValor;
+        this.utils = new Utils();
     }
 
     @NonNull
@@ -46,11 +44,19 @@ public class AdapterItens extends RecyclerView.Adapter<AdapterItens.EventeViewHo
     @Override
     public void onBindViewHolder(@NonNull AdapterItens.EventeViewHolder holder, @SuppressLint("RecyclerView") int position) {
         AFazer aFazer = listaAFazeres.get(position);
-        holder.textoAFazer.setText(aFazer.getNome());
+        holder.textoAFazer.setText(" "+aFazer.getQuantidade()+" | "+aFazer.getNome());
+        holder.editPreco.setHint(utils.formatarTextoValor(String.valueOf(aFazer.getValorItem()), true));
         if(aFazer.isFinalizado()){
-            holder.viewFinalizado.setVisibility(View.VISIBLE);
+//            holder.viewFinalizado.setVisibility(View.VISIBLE);
+            holder.textoAFazer.setTextColor(context.getResources().getColor(R.color.black));
             holder.constraintBackgtroundItem.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_a_fazer_concluido));
             holder.checkBoxConcluido.setChecked(true);
+        }
+        else {
+//            holder.viewFinalizado.setVisibility(View.GONE);
+            holder.textoAFazer.setTextColor(context.getResources().getColor(R.color.white));
+            holder.constraintBackgtroundItem.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_a_fazer_nao_concluido));
+            holder.checkBoxConcluido.setChecked(false);
         }
         holder.botaoDeletar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,15 +70,17 @@ public class AdapterItens extends RecyclerView.Adapter<AdapterItens.EventeViewHo
             @Override
             public void onClick(View view) {
                 if(holder.checkBoxConcluido.isChecked()){
-                    holder.viewFinalizado.setVisibility(View.VISIBLE);
+//                    holder.viewFinalizado.setVisibility(View.VISIBLE);
+                    holder.textoAFazer.setTextColor(context.getResources().getColor(R.color.black));
                     holder.constraintBackgtroundItem.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_a_fazer_concluido));
-                    listaAFazeres.get(position).setFinalizado(true);
+                    aFazer.setFinalizado(true);
                     globals.atualizarAFazere(listaAFazeres);
                 }
                 else{
-                    holder.viewFinalizado.setVisibility(View.GONE);
+//                    holder.viewFinalizado.setVisibility(View.GONE);
+                    holder.textoAFazer.setTextColor(context.getResources().getColor(R.color.white));
                     holder.constraintBackgtroundItem.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_a_fazer_nao_concluido));
-                    listaAFazeres.get(position).setFinalizado(false);
+                    aFazer.setFinalizado(false);
                     globals.atualizarAFazere(listaAFazeres);
                 }
 
@@ -82,21 +90,64 @@ public class AdapterItens extends RecyclerView.Adapter<AdapterItens.EventeViewHo
         holder.itemView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                holder.editPreco.clearFocus();
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    // Verifica se o toque não está dentro do EditText
+                    if (!(view instanceof EditText)) {
+                        holder.editPreco.clearFocus();  // Remove o foco do EditText
+                        utils.fecharTeclado(context, view);  // Fecha o teclado
+                    }
+                }
                 return false;
+            }
+        });
+
+        holder.editPreco.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Remove o TextWatcher temporariamente para evitar chamadas recursivas
+                holder.editPreco.removeTextChangedListener(this);
+
+                // Formata o texto como um valor monetário
+                String formattedText = utils.formatarTextoValor(editable.toString(), false);
+
+                // Atualiza o texto no EditText
+                holder.editPreco.setText(formattedText);
+                holder.editPreco.setSelection(formattedText.length()); // Coloca o cursor no final do texto
+
+                // Re-adiciona o TextWatcher
+                holder.editPreco.addTextChangedListener(this);
             }
         });
         holder.editPreco.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(!b){
-                    double valorNovo = Double.parseDouble(holder.editPreco.getText().toString());
-                    interfaceAtualizarValor.atualizarValor(valorNovo);
+                    if(!holder.editPreco.getText().toString().isEmpty() && position <= listaAFazeres.size() && listaAFazeres.size() != 0){
+                        double valorNovo = utils.converterParaDouble(holder.editPreco.getText().toString());
+                        listaAFazeres.get(position).setValorItem(valorNovo);
+                        globals.atualizarAFazere(listaAFazeres);
+                        interfaceAtualizarValor.atualizarValor(listaAFazeres.get(position));
+                        if(position == listaAFazeres.size()-1){
+                            utils.fecharTeclado(context, view);
+                        }
+                    }
+
 //                    holder.editPreco.setFocusable(false);
 //                    notifyDataSetChanged();
                 }
             }
         });
+
     }
 
     @Override
@@ -104,7 +155,7 @@ public class AdapterItens extends RecyclerView.Adapter<AdapterItens.EventeViewHo
         return listaAFazeres.size();
     }
 
-    public class EventeViewHolder extends RecyclerView.ViewHolder {
+    public static class EventeViewHolder extends RecyclerView.ViewHolder {
         private AppCompatTextView textoAFazer;
         private CheckBox checkBoxConcluido;
         private AppCompatImageView botaoDeletar;

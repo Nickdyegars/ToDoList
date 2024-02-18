@@ -2,9 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="azulClaro">#6A6EAD</color>
     <color name="cinzaClaro">#63657A</color>
-    <color name="azulEscuro">#5C65E0</color>
-    <color name="cinzaMedio">#383947</color>
-    <color name="cinzaEscuro">#1E1F33</color>
+    <color name="corPrincipal">#555FE0</color>
+    <color name="corSecundariaRoxo">#7955E0</color>
+    <color name="corSecundariaVerde">#58E1DE</color>
 </resources>

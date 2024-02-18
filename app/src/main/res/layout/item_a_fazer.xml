@@ -50,18 +50,35 @@
         android:textAlignment="center"
         android:background="@drawable/background_preco"
         android:textColor="@color/black"
-        android:textColorHint="@color/black"
+        android:textColorHint="@color/cinzaClaro"
         android:inputType="numberDecimal"
         android:hint="R$ 10,00"
         app:layout_constraintEnd_toStartOf="@id/iconeDeletar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!-- Icone deletar -->
+<!--    <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--        android:id="@+id/iconeDeletar"-->
+<!--        android:layout_width="40dp"-->
+<!--        android:layout_height="match_parent"-->
+
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent">-->
+<!--        <androidx.appcompat.widget.AppCompatTextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:textColor="@color/black"-->
+<!--            android:textSize="30sp"-->
+<!--            android:gravity="center"-->
+<!--            android:text="X"/>-->
+<!--    </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+<!--     Icone deletar -->
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iconeDeletar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

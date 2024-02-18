@@ -85,7 +85,7 @@ public class Globals {
 
             for(int i=0; i<listaAFazer.size(); i++)
             {
-                if(listaAFazer.get(i).getNome().equals(aFazer.getNome()))
+                if(listaAFazer.get(i).getId().equals(aFazer.getId()))
                 {
                     listaAFazer.remove(i);
                 }
@@ -116,5 +116,14 @@ public class Globals {
             e.printStackTrace();
         }
         return valorTotal;
+    }
+
+    public void salvarVisualisacaoModalBoasVindas(boolean visto){
+        this.editor.putString("VistoModalPrimeiraVez", String.valueOf(visto));
+        this.editor.apply();
+    }
+
+    public boolean consultarVisualicaoModal(){
+        return Boolean.parseBoolean(this.sharedPreferences.getString("VistoModalPrimeiraVez",""));
     }
 }
